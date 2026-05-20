@@ -497,9 +497,9 @@ fulano:top @ciclana
 
 <div class="box">
 
-<h2 id="chanceExtra">Peso Inteligente</h2>
+<h2 id="chanceExtra">Sorteio Justo</h2>
 
-<span>Mais comentários = mais chance</span>
+<span>1 pessoa = 1 chance</span>
 
 </div>
 
@@ -594,23 +594,7 @@ function parseLinhas(texto){
     return {validos, contagem};
 }
 
-function peso(qtd){
-    return 1 + Math.min(qtd*0.35, 8);
-}
-
-function buildPool(contagem){
-    const pool=[];
-    const pesos={};
-    Object.keys(contagem).forEach((user)=>{
-        const p=peso(contagem[user]);
-        pesos[user]=p;
-        const rep=Math.max(1, Math.floor(p*10));
-        for(let i=0;i<rep;i++) pool.push(user);
-    });
-    return {pool, pesos};
-}
-
-function renderLogs(contagem, pesos, vencedor){
+function renderLogs(contagem, vencedor){
     const logsEl=document.getElementById('logs');
     logsEl.innerHTML='';
 
@@ -622,7 +606,6 @@ function renderLogs(contagem, pesos, vencedor){
         `
         👤 ${user} —
         ${contagem[user]} comentário(s) —
-        Peso: ${(Number(pesos[user])||0).toFixed(2)}
         ${user===vencedor ? '🏆' : ''}
         `;
         logsEl.appendChild(div);
@@ -654,21 +637,20 @@ function sortearLocal(){
         return;
     }
 
-    const {pool, pesos}=buildPool(contagem);
     let count=0;
     const interval=setInterval(()=>{
-        roulette.innerText=pool[pickRandomIndex(pool.length)];
+        roulette.innerText=participantes[pickRandomIndex(participantes.length)];
         count++;
         if(count>45){
             clearInterval(interval);
-            const vencedor=pool[pickRandomIndex(pool.length)];
+            const vencedor=participantes[pickRandomIndex(participantes.length)];
             roulette.innerText='🎉 '+vencedor;
             winnerEl.innerHTML=
             `
             GANHADOR<br>
             ${vencedor}
             `;
-            renderLogs(contagem, pesos, vencedor);
+            renderLogs(contagem, vencedor);
             btn.disabled=false;
         }
     },100);
